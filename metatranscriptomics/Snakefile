@@ -1,0 +1,87 @@
+import os
+
+TRIMMED_DIR = "Trimmed_fastq_test"
+BAM_DIR = "Bam_files_test"
+FASTQ_DIR = "SRA_FastDump_Dir_test"
+REFERENCE = "/lustre/BIF/nobackup/chen254/Dataset/A1_Anne/submission_final_CDS.fna"
+# Use config to get the input file for runs.txt
+run_file = config.get("run_file", "runs.txt") # default file is runs.txt if no specific file provided
+# Read the runs from the file specified in the config
+runs = [line.strip() for line in open(run_file) if line.strip()]
+#runs = [line.strip() for line in open("runs.txt") if line.strip()]
+rule all:
+    input:
+        expand(os.path.join(BAM_DIR, "{run_id}.bam"), run_id=runs)
+
+rule download_fastq:
+    output:
+        single=os.path.join(FASTQ_DIR, "{run_id}.fastq.gz"),
+        paired1=os.path.join(FASTQ_DIR, "{run_id}_1.fastq.gz"),
+        paired2=os.path.join(FASTQ_DIR, "{run_id}_2.fastq.gz")
+    log:
+        os.path.join("LOGS", "{run_id}.fastqdump.log")
+    run:
+        shell("mkdir -p {FASTQ_DIR}")
+        # Run the shell command to download the FASTQ files
+        shell("bash download_fastq.sh {wildcards.run_id} &> {log}")
+        # Determine which files were produced
+        single = output.single
+        paired1 = output.paired1
+        paired2 = output.paired2
+        # Check for the existence of the paired-end files
+        paired_files_exist = os.path.exists(paired1) and os.path.exists(paired2)
+        single_file_exists = os.path.exists(single)
+        # Adjust outputs based on what was actually downloaded
+        if paired_files_exist and not single_file_exists:
+            shell(f"touch {output.single}")
+        elif single_file_exists and not paired_files_exist:
+            shell(f"touch {output.paired1} {output.paired2}")
+# Rule to trim fastq files using cutadapt
+rule trim_cutadapt:
+    input:
+        single=os.path.join(FASTQ_DIR, "{run_id}.fastq.gz"),
+        paired1=os.path.join(FASTQ_DIR, "{run_id}_1.fastq.gz"),
+        paired2=os.path.join(FASTQ_DIR, "{run_id}_2.fastq.gz")
+    output:
+        trimmed_single=os.path.join(TRIMMED_DIR, "{run_id}_trimmed.fastq.gz"),
+        trimmed_paired1=os.path.join(TRIMMED_DIR, "{run_id}_trimmed_1.fastq.gz"),
+        trimmed_paired2=os.path.join(TRIMMED_DIR, "{run_id}_trimmed_2.fastq.gz")
+    log:
+        os.path.join("LOGS", "{run_id}.cutadapt.log")
+    run:
+        shell("mkdir -p {TRIMMED_DIR}")
+        if os.path.exists(input.paired1) and os.path.exists(input.paired2) and \
+             os.path.getsize(input.paired1) > 0 and os.path.getsize(input.paired2) > 0:
+            if os.path.exists(input.single) and os.path.getsize(input.single) > 0:
+                shell(f"cutadapt -q 30 -o {output.trimmed_paired1} -p {output.trimmed_paired2} {input.paired1} {input.paired2} &> {log}")
+            else:
+                shell(f"cutadapt -q 30 -o {output.trimmed_paired1} -p {output.trimmed_paired2} {input.paired1} {input.paired2} &> {log}")
+                shell(f"touch {output.trimmed_single}")
+        elif os.path.exists(input.single) and os.path.getsize(input.single) > 0:
+            shell(f"cutadapt -q 30 -o {output.trimmed_single} {input.single} &> {log}")
+            shell(f"touch {output.trimmed_paired1}")
+            shell(f"touch {output.trimmed_paired2}")
+# Rule to generate BAM files using coverm
+rule align_coverm:
+    input:
+        trimmed_single = os.path.join(TRIMMED_DIR, "{run_id}_trimmed.fastq.gz"),
+        trimmed_paired1 = os.path.join(TRIMMED_DIR, "{run_id}_trimmed_1.fastq.gz"),
+        trimmed_paired2 = os.path.join(TRIMMED_DIR, "{run_id}_trimmed_2.fastq.gz"),
+        reference = REFERENCE
+    output:
+        bam = os.path.join(BAM_DIR, "{run_id}.bam")
+    log:
+        os.path.join("LOGS", "{run_id}.coverm.log")
+    run:
+        shell(f"mkdir -p {BAM_DIR}")
+        if os.path.getsize(input.trimmed_single) > 0:
+            shell(f"coverm make --discard-unmapped --single {input.trimmed_single} -r {input.reference} -p bwa-mem2 -o {BAM_DIR} &> {log}")
+            shell(f"mv {BAM_DIR}/*{wildcards.run_id}_*.bam {output.bam}")
+        elif os.path.getsize(input.trimmed_paired1) > 0 and os.path.getsize(input.trimmed_paired2) > 0:
+            shell(f"coverm make --discard-unmapped -c {input.trimmed_paired1} {input.trimmed_paired2} -r {input.reference} -p bwa-mem2 -o {BAM_DIR} &> {log}")
+            shell(f"mv {BAM_DIR}/*{wildcards.run_id}_*.bam {output.bam}")
+        else:
+            raise Exception(f"No valid trimmed FASTQ files found for run {wildcards.run_id}")
+# how many threads: split itself
+# default is 1 from coverm
+# threads 4? half of the coresrom the file specified in the config
