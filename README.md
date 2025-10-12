@@ -12,3 +12,6 @@ scripts for feature extraction
 ## combined_gridsearch.py: 
 XGboost for classifying genes with selected features
 
+## data
+training data
+
