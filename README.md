@@ -4,7 +4,8 @@
 This work advances methods for orphan gene discovery and demonstrates that expressed orphan genes differ systematically from conserved genes and spurious orphan genes in sequence composition, structural constraints, and evolutionary signals.
 
 ## metatranscriptomics: 
-a snakelike pipeline to predict SOGs and EOGs from original OGs
+Snakefile and download_fastq.sh: a snakelike pipeline to generate bam files by aligning original OGs to SRA datasets whose accessions are listed in runs_4969.txt.
+process_bam.sh: classifying SOGs and EOGs with the thresholds
 
 ## feature_extraction: 
 scripts for feature extraction
@@ -14,4 +15,5 @@ XGboost for classifying genes with selected features
 
 ## data
 training data
+
 
