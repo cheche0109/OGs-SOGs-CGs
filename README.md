@@ -5,6 +5,7 @@ This work advances methods for orphan gene discovery and demonstrates that expre
 
 ## metatranscriptomics: 
 Snakefile and download_fastq.sh: a snakelike pipeline to generate bam files by aligning original OGs to SRA datasets whose accessions are listed in runs_4969.txt.
+
 process_bam.sh: classifying SOGs and EOGs with the thresholds
 
 ## feature_extraction: 
@@ -15,5 +16,6 @@ XGboost for classifying genes with selected features
 
 ## data
 training data
+
 
 
