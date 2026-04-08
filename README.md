@@ -16,8 +16,11 @@ XGboost for classifying genes with selected features
 
 ## data
 training data: CGs_genomes_over1_700_.txt, EOGs_genomes_over1_700_.txt, SOGs_genomes_over1_700_.txt
+
 fasta files: genes.fna, proteins.faa
+
 Feature table: All_features_noNA.csv.gz
+
 Expression table: expression_CGs.csv.gz, expression_OGs.csv.gz
 
 
