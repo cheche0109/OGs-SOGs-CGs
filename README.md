@@ -16,7 +16,7 @@ scripts for feature extraction
 XGboost for classifying genes with selected features
 
 ## data
-**training data**: CGs_genomes_over1_700_.txt, EOGs_genomes_over1_700_.txt, SOGs_genomes_over1_700_.txt, CGs_genomes_over1_700_gt10species.txt。
+**training data**: CGs_genomes_over1_700_.txt, EOGs_genomes_over1_700_.txt, SOGs_genomes_over1_700_.txt, CGs_genomes_over1_700_gt10species.txt  
 For example, CGs_genomes_over1_700_.txt contains the conserved genes that are present in more than 700 genomes within a species. CGs_genomes_over1_700_gt10species.txt contains the subset of those conserved genes that are present in more than 700 genomes within a species and are also found in more than 10 different species.
 
 **fasta files**: genes.fna, proteins.faa  
