@@ -16,20 +16,15 @@ scripts for feature extraction
 XGboost for classifying genes with selected features
 
 ## data
-training data: CGs_genomes_over1_700_.txt, EOGs_genomes_over1_700_.txt, SOGs_genomes_over1_700_.txt, CGs_genomes_over1_700_gt10species.txt
+**training data**: CGs_genomes_over1_700_.txt, EOGs_genomes_over1_700_.txt, SOGs_genomes_over1_700_.txt, CGs_genomes_over1_700_gt10species.txt。
+For example, CGs_genomes_over1_700_.txt contains the conserved genes that are present in more than 700 genomes within a species. CGs_genomes_over1_700_gt10species.txt contains the subset of those conserved genes that are present in more than 700 genomes within a species and are also found in more than 10 different species.
 
-For example, **CGs_genomes_over1_700_.txt** contains the conserved genes that are present in more than 700 genomes within a species. **CGs_genomes_over1_700_gt10species.txt** contains the subset of those conserved genes that are present in more than 700 genomes within a species and are also found in more than 10 different species.
+**fasta files**: genes.fna, proteins.faa  
+genes.fna contains the nucleotide sequences of both orphan genes and conserved genes, while proteins.faa contains the corresponding protein sequences for both orphan genes and conserved genes.
 
+**feature table**: All_features_noNA.csv.gz
 
-fasta files: genes.fna, proteins.faa
-
-**genes.fna** contains the nucleotide sequences of both orphan genes and conserved genes, while **proteins.faa** contains the corresponding protein sequences for both orphan genes and conserved genes.
-
-
-Feature table: All_features_noNA.csv.gz
-
-
-Expression table: expression_CGs.csv.gz, expression_OGs.csv.gz
+**expression table**: expression_CGs.csv.gz, expression_OGs.csv.gz
 
 
 
